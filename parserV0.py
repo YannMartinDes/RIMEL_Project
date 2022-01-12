@@ -1,5 +1,5 @@
 import glob2
-ListFile=glob2.glob(r"C:\Users\tnersissian\Downloads\rapidminer-studio-modular-master\rapidminer-studio-core\src\main\java\com\rapidminer\operator\**/*.java")
+ListFile=glob2.glob(r".\rapidminer-studio-modular-master\rapidminer-studio-core\src\main\java\com\rapidminer\operator\**/*.java")
 for File in ListFile:
     file1 = open(File, 'r')
     count = 0
