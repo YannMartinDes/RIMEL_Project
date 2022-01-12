@@ -1,0 +1,13 @@
+apply from: '../os-module.gradle'
+
+dependencies {
+    compile project(':rapidminer-studio-logging')
+    compile project(':rapidminer-studio-interfaces')
+
+    // commons-lang for different String utility functions (http://commons.apache.org/proper/commons-lang/)
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'commons-io:commons-io:2.6'
+
+    compile 'com.fasterxml.jackson.core:jackson-core:2.10.5'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.5.1'
+}

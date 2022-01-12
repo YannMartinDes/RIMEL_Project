@@ -1,0 +1,5 @@
+apply from: '../os-module.gradle'
+
+dependencies {
+    compile project(':rapidminer-studio-settings')
+}

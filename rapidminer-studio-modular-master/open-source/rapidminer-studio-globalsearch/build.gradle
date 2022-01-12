@@ -1,0 +1,9 @@
+apply from: '../os-module.gradle'
+
+dependencies {
+    compile project(':rapidminer-studio-tools')
+
+    compile 'org.apache.lucene:lucene-queryparser:7.2.0'
+    // Highlight Lucene search result matches
+    compile 'org.apache.lucene:lucene-highlighter:7.2.0'
+}

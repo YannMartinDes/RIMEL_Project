@@ -1,0 +1,7 @@
+apply from: '../os-module.gradle'
+
+dependencies {
+    compile project(':rapidminer-studio-logging')
+    compile 'commons-io:commons-io:2.6'
+    compile 'commons-lang:commons-lang:2.6'
+}
