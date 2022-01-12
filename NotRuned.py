@@ -14,8 +14,8 @@ count=0
 for File in ListFile:
     file1 = open(File, 'r')
     line = file1.read()
+    print(File)
     while (line.strip().find("addPrecondition") >= 0):
-        print(File)
         startIndex=line.strip().find("addPrecondition")
         endString=line[startIndex:len(line)]
         endIndex=finish(endString)
