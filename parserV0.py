@@ -42,27 +42,35 @@ def preconditionDict(ListFile):
     for File in ListFile:
         file1 = open(File, 'r')
         body = file1.read()
-        startIndex=body.strip().find(".addPrecondition")+21
+        startIndex=body.strip().find(".addPrecondition")
         
             
         while (startIndex >= 0):
+            override= "Not Overrode"
             stringToEvaluate=body[startIndex:len(body)]
-            endIndex=findNextParenthesis(stringToEvaluate)
+            startNamePrecondition = stringToEvaluate.strip().find("new ")
+            if startNamePrecondition<50:
+                startIndex+=startNamePrecondition+4
+                stringToEvaluate=body[startIndex:len(body)]
+                endIndex=findNextParenthesis(stringToEvaluate)
+            else:
+                endIndex = startIndex+51
 
             if(endIndex-startIndex<50):
-                #print(body[startIndex:startIndex+endIndex]+"\n\n")
+                stringToEvaluate=body[startIndex-(startNamePrecondition+4):len(body)]
+                endPreconditionIndex=findEndIndex(stringToEvaluate)
+                if body[startIndex-(startNamePrecondition+4):startIndex+endPreconditionIndex].strip().find("@Override")>0:
+                    override="Overrode"
                 if File in dictList:
-                    dictList[File].append(body[startIndex:startIndex+endIndex])
+                    dictList[File].append({body[startIndex:startIndex+endIndex],override})
                 else :
-                    dictList[File]=[body[startIndex:startIndex+endIndex]]
+                    dictList[File]=[{body[startIndex:startIndex+endIndex],override}]
             count=count+1
             if(endIndex != None):
                 body=body[startIndex+endIndex:]
             else:
                 body=body[startIndex:]
             startIndex=body.strip().find(".addPrecondition")
-            if(startIndex > 0):
-                startIndex+=21
         file1.close()
     print(count)
     print(dictList)
