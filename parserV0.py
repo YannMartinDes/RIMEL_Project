@@ -62,9 +62,9 @@ def preconditionDict(ListFile):
                 if body[startIndex-(startNamePrecondition+4):startIndex+endPreconditionIndex].strip().find("@Override")>0:
                     override="Overrode"
                 if File in dictList:
-                    dictList[File].append({body[startIndex:startIndex+endIndex],override})
+                    dictList[File].append([body[startIndex:startIndex+endIndex],override])
                 else :
-                    dictList[File]=[{body[startIndex:startIndex+endIndex],override}]
+                    dictList[File]=[[body[startIndex:startIndex+endIndex],override]]
             count=count+1
             if(endIndex != None):
                 body=body[startIndex+endIndex:]
