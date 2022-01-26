@@ -1,4 +1,6 @@
 import glob2
+import csv
+
 def findEndIndex(string):
     count=0
     for i in range(len(string)):
@@ -73,7 +75,38 @@ def preconditionDict(ListFile):
             startIndex=body.strip().find(".addPrecondition")
         file1.close()
     print(count)
-    print(dictList)
+    printCSV(dictList)
+
+def printCSV(myDict):
+    csv_columns = ['fileName']
+    for elem in myDict:
+        for precondition in myDict[elem]:
+            if precondition[0] not in csv_columns:
+                csv_columns.append(precondition[0])
+    dict_data=[]
+    for elem in myDict:
+        data = {}
+        data[csv_columns[0]]=elem.split('\\')[-1]
+        for column in csv_columns[1:]:
+            count = 0
+            for precondition in myDict[elem]:
+                if precondition[0] == column:
+                    count+=1
+            print(column)
+            print(count)
+            data[column]=count
+            print(data) 
+        dict_data.append(data)
+    csv_file = "Nombre_Preconditions_par_fichier_java.csv"
+    try:
+        with open(csv_file, 'w',newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            for data in dict_data:
+                writer.writerow(data)
+    except IOError:
+        print("I/O error")
+    
 
 def findNextParenthesis(string):
     count=0
