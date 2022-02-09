@@ -17,26 +17,43 @@ ListFile=glob2.glob(r".\rapidminer-studio-modular-master\rapidminer-studio-core\
 
 def findPrecondition(ListFile):
     count=0
+    res = {}
 
     for File in ListFile:
         file1 = open(File, 'r')
+        
         body = file1.read()
         startIndex=body.strip().find(".addPrecondition")
         
         if (startIndex>=0):
-            print(File)
+            fileName = File.split('\\')[-1]
+            res[fileName] = []
             
         while (startIndex >= 0):
             stringToEvaluate=body[startIndex:len(body)]
             endIndex=findEndIndex(stringToEvaluate)
             
-            print(body[startIndex:startIndex+endIndex]+"\n\n")
+            code = body[startIndex:startIndex+endIndex]
+            res[fileName].append(code)
+
             count=count+1
             body=body[startIndex+endIndex:]
             startIndex=body.strip().find(".addPrecondition")
         file1.close()
+    return res
         
-    print(count)
+def overrideDict(listPreCond):
+    res = {}
+
+    for key in listPreCond:
+        for cond in listPreCond[key]:
+            if(cond.find("@Override") >0):
+                if(key in res):
+                    res[key].append(cond)
+                else:
+                    res[key] = [cond]
+    
+    return res   
 
 def preconditionDict(ListFile):
     count=0
@@ -109,11 +126,47 @@ def printCSV(myDict):
     
 
 def findNextParenthesis(string):
-    count=0
     for i in range(len(string)):
         if (string[i]=='('):
             return i
     return None    
 
-preconditionDict(ListFile)
-#findPrecondition(ListFile)
+def findTextInBracket(string):
+    foundFirst = False
+    count=0
+    for i in range(len(string)):
+        if string[i]=='{':
+            foundFirst = True
+            count=count+1
+        elif string[i]=='}':
+            count=count-1
+        elif count==0 and foundFirst:
+            return i
+    return None 
+
+def mandatoryDict(listPreCond):
+    res = {}
+
+    for key in listPreCond:
+        for cond in listPreCond[key]:
+            startInd = cond.find("isMandatory")
+            if(startInd >0):
+                endInd = findTextInBracket(cond[startInd:])
+                mandatoryCode = cond[startInd:startInd+endInd]
+                if(key in res):
+                    res[key].append(mandatoryCode)
+                else:
+                    res[key] = [mandatoryCode]
+    return res  
+
+#preconditionDict(ListFile)
+listPredCond = findPrecondition(ListFile)
+overridePredCond = overrideDict(listPredCond)
+mandatoryPreCond = mandatoryDict(overridePredCond)
+
+
+for key in mandatoryPreCond:
+    print(key+"--------------------------------------------------------")
+    for cond in mandatoryPreCond[key]:
+        print(cond)
+        print("\n")
