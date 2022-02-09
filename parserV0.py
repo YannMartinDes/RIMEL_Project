@@ -131,14 +131,14 @@ def findNextParenthesis(string):
             return i
     return None    
 
-def findTextInBracket(string):
+def findTextBetweenChar(string,charOpen,charClose):
     foundFirst = False
     count=0
     for i in range(len(string)):
-        if string[i]=='{':
+        if string[i]==charOpen:
             foundFirst = True
             count=count+1
-        elif string[i]=='}':
+        elif string[i]==charClose:
             count=count-1
         elif count==0 and foundFirst:
             return i
@@ -151,7 +151,7 @@ def mandatoryDict(listPreCond):
         for cond in listPreCond[key]:
             startInd = cond.find("isMandatory")
             if(startInd >0):
-                endInd = findTextInBracket(cond[startInd:])
+                endInd = findTextBetweenChar(cond[startInd:],'{','}')
                 mandatoryCode = cond[startInd:startInd+endInd]
                 if(key in res):
                     res[key].append(mandatoryCode)
@@ -159,14 +159,48 @@ def mandatoryDict(listPreCond):
                     res[key] = [mandatoryCode]
     return res  
 
+def additionnalCheckDict(listPreCond):
+    res = {}
+
+    for key in listPreCond:
+        for cond in listPreCond[key]:
+            startInd = cond.find("makeAdditionalChecks")
+            if(startInd >0):
+                endInd = findTextBetweenChar(cond[startInd:],'{','}')
+                addCheckCode = cond[startInd:startInd+endInd]
+                if(key in res):
+                    res[key].append(addCheckCode)
+                else:
+                    res[key] = [addCheckCode]
+    return res  
+
+def errorDict(listAddCheckOverride):
+    res = {}
+
+    for key in listAddCheckOverride:
+        for code in listAddCheckOverride[key]:
+            startInd = code.find("Error(") #createError
+            while(startInd >0):
+                endInd = findTextBetweenChar(code[startInd:],'(',')')
+                errorCode = code[startInd:startInd+endInd]
+                if(key in res):
+                    res[key].append(errorCode)
+                else:
+                    res[key] = [errorCode]
+                code = code[endInd:]
+                startInd = code.find("Error(") #createError
+
+    return res  
+
 #preconditionDict(ListFile)
-listPredCond = findPrecondition(ListFile)
-overridePredCond = overrideDict(listPredCond)
-mandatoryPreCond = mandatoryDict(overridePredCond)
+listPreCond = findPrecondition(ListFile)
+overridePreCond = overrideDict(listPreCond)
+mandatoryOverride = mandatoryDict(overridePreCond)
+addCheckOverride = additionnalCheckDict(listPreCond)
+errorAddCheck = errorDict(addCheckOverride)
 
-
-for key in mandatoryPreCond:
+for key in errorAddCheck:
     print(key+"--------------------------------------------------------")
-    for cond in mandatoryPreCond[key]:
+    for cond in errorAddCheck[key]:
         print(cond)
         print("\n")
