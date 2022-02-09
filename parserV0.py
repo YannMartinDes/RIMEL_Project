@@ -17,26 +17,43 @@ ListFile=glob2.glob(r".\rapidminer-studio-modular-master\rapidminer-studio-core\
 
 def findPrecondition(ListFile):
     count=0
+    res = {}
 
     for File in ListFile:
         file1 = open(File, 'r')
+        
         body = file1.read()
         startIndex=body.strip().find(".addPrecondition")
         
         if (startIndex>=0):
-            print(File)
+            fileName = File.split('\\')[-1]
+            res[fileName] = []
             
         while (startIndex >= 0):
             stringToEvaluate=body[startIndex:len(body)]
             endIndex=findEndIndex(stringToEvaluate)
             
-            print(body[startIndex:startIndex+endIndex]+"\n\n")
+            code = body[startIndex:startIndex+endIndex]
+            res[fileName].append(code)
+
             count=count+1
             body=body[startIndex+endIndex:]
             startIndex=body.strip().find(".addPrecondition")
         file1.close()
+    return res
         
-    print(count)
+def overrideDict(listPreCond):
+    res = {}
+
+    for key in listPreCond:
+        for cond in listPreCond[key]:
+            if(cond.find("@Override") >0):
+                if(key in res):
+                    res[key].append(cond)
+                else:
+                    res[key] = [cond]
+    
+    return res   
 
 def preconditionDict(ListFile):
     count=0
@@ -109,11 +126,81 @@ def printCSV(myDict):
     
 
 def findNextParenthesis(string):
-    count=0
     for i in range(len(string)):
         if (string[i]=='('):
             return i
     return None    
 
-preconditionDict(ListFile)
-#findPrecondition(ListFile)
+def findTextBetweenChar(string,charOpen,charClose):
+    foundFirst = False
+    count=0
+    for i in range(len(string)):
+        if string[i]==charOpen:
+            foundFirst = True
+            count=count+1
+        elif string[i]==charClose:
+            count=count-1
+        elif count==0 and foundFirst:
+            return i
+    return None 
+
+def mandatoryDict(listPreCond):
+    res = {}
+
+    for key in listPreCond:
+        for cond in listPreCond[key]:
+            startInd = cond.find("isMandatory")
+            if(startInd >0):
+                endInd = findTextBetweenChar(cond[startInd:],'{','}')
+                mandatoryCode = cond[startInd:startInd+endInd]
+                if(key in res):
+                    res[key].append(mandatoryCode)
+                else:
+                    res[key] = [mandatoryCode]
+    return res  
+
+def additionnalCheckDict(listPreCond):
+    res = {}
+
+    for key in listPreCond:
+        for cond in listPreCond[key]:
+            startInd = cond.find("makeAdditionalChecks")
+            if(startInd >0):
+                endInd = findTextBetweenChar(cond[startInd:],'{','}')
+                addCheckCode = cond[startInd:startInd+endInd]
+                if(key in res):
+                    res[key].append(addCheckCode)
+                else:
+                    res[key] = [addCheckCode]
+    return res  
+
+def errorDict(listAddCheckOverride):
+    res = {}
+
+    for key in listAddCheckOverride:
+        for code in listAddCheckOverride[key]:
+            startInd = code.find("Error(") #createError
+            while(startInd >0):
+                endInd = findTextBetweenChar(code[startInd:],'(',')')
+                errorCode = code[startInd:startInd+endInd]
+                if(key in res):
+                    res[key].append(errorCode)
+                else:
+                    res[key] = [errorCode]
+                code = code[endInd:]
+                startInd = code.find("Error(") #createError
+
+    return res  
+
+#preconditionDict(ListFile)
+listPreCond = findPrecondition(ListFile)
+overridePreCond = overrideDict(listPreCond)
+mandatoryOverride = mandatoryDict(overridePreCond)
+addCheckOverride = additionnalCheckDict(listPreCond)
+errorAddCheck = errorDict(addCheckOverride)
+
+for key in errorAddCheck:
+    print(key+"--------------------------------------------------------")
+    for cond in errorAddCheck[key]:
+        print(cond)
+        print("\n")
