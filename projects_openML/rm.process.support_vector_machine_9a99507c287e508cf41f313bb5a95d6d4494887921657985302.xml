@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process version="6.5.002">
+    <context>
+        <input/>
+        <output/>
+        <macros/>
+    </context>
+    <operator activated="true" class="process" compatibility="6.5.002" name="Process">
+        <process>
+            <operator activated="true"
+                class="openmlconnector:download_openml_task"
+                compatibility="1.0.000" name="Download"/>
+            <operator activated="true"
+                class="openmlconnector:execute_openml_task"
+                compatibility="1.0.000" name="Execute">
+                <process>
+                    <operator activated="true"
+                        class="support_vector_machine"
+                        compatibility="6.5.002" name="SVM"/>
+                    <connect from_port="example set" to_op="SVM" to_port="training set"/>
+                    <connect from_op="SVM" from_port="model" to_port="model"/>
+                    <portSpacing port="source_example set" spacing="0"/>
+                    <portSpacing port="sink_model" spacing="0"/>
+                </process>
+            </operator>
+            <operator activated="true"
+                class="openmlconnector:upload_openml_task"
+                compatibility="1.0.000" name="Upload"/>
+            <connect from_op="Download" from_port="task" to_op="Execute" to_port="task"/>
+            <connect from_op="Execute" from_port="prediction set"
+                to_op="Upload" to_port="predictions"/>
+            <portSpacing port="source_input 1" spacing="0"/>
+            <portSpacing port="sink_result 1" spacing="0"/>
+        </process>
+    </operator>
+</process>
