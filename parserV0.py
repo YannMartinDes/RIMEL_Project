@@ -56,43 +56,45 @@ def overrideDict(listPreCond):
     return res   
 
 def preconditionDict(ListFile):
-    count=0
     dictList = {}
     for File in ListFile:
         file1 = open(File, 'r')
         body = file1.read()
         startIndex=body.strip().find(".addPrecondition")
         
-            
         while (startIndex >= 0):
-            override= "Not Overrode"
-            stringToEvaluate=body[startIndex:len(body)]
-            startNamePrecondition = stringToEvaluate.strip().find("new ")
-            if startNamePrecondition<50:
-                startIndex+=startNamePrecondition+4
-                stringToEvaluate=body[startIndex:len(body)]
-                endIndex=findNextParenthesis(stringToEvaluate)
-            else:
-                endIndex = startIndex+51
-
-            if(endIndex-startIndex<50):
-                stringToEvaluate=body[startIndex-(startNamePrecondition+4):len(body)]
-                endPreconditionIndex=findEndIndex(stringToEvaluate)
-                if body[startIndex-(startNamePrecondition+4):startIndex+endPreconditionIndex].strip().find("@Override")>0:
-                    override="Overrode"
-                if File in dictList:
-                    dictList[File].append([body[startIndex:startIndex+endIndex],override])
-                else :
-                    dictList[File]=[[body[startIndex:startIndex+endIndex],override]]
-            count=count+1
-            if(endIndex != None):
-                body=body[startIndex+endIndex:]
-            else:
-                body=body[startIndex:]
+            body=getPreconditonNameAndIfOverrode(body,startIndex,dictList,File)
             startIndex=body.strip().find(".addPrecondition")
         file1.close()
-    print(count)
     printCSV(dictList)
+
+def getPreconditonNameAndIfOverrode(body,startIndex,dictList,File):
+    override= "Not Overrode"
+    stringToEvaluate=body[startIndex:len(body)]
+    startNamePrecondition = stringToEvaluate.strip().find("new ")
+    #to avoid taking comments
+    if startNamePrecondition<50:
+        startIndex+=startNamePrecondition+4
+        stringToEvaluate=body[startIndex:len(body)]
+        endIndex=findNextParenthesis(stringToEvaluate)
+    else:
+        endIndex = startIndex+51
+
+    if(endIndex-startIndex<50):
+        stringToEvaluate=body[startIndex-(startNamePrecondition+4):len(body)]
+        endPreconditionIndex=findEndIndex(stringToEvaluate)
+        if body[startIndex-(startNamePrecondition+4):startIndex+endPreconditionIndex].strip().find("@Override")>0:
+            override="Overrode"
+        if File in dictList:
+            dictList[File].append([body[startIndex:startIndex+endIndex],override])
+        else :
+            dictList[File]=[[body[startIndex:startIndex+endIndex],override]]
+    if(endIndex != None):
+        body=body[startIndex+endIndex:]
+    else:
+        body=body[startIndex:]
+    return body
+    
 
 def printCSV(myDict):
     csv_columns = ['fileName']
@@ -123,7 +125,6 @@ def printCSV(myDict):
                 writer.writerow(data)
     except IOError:
         print("I/O error")
-    
 
 def findNextParenthesis(string):
     for i in range(len(string)):
@@ -192,7 +193,7 @@ def errorDict(listAddCheckOverride):
 
     return res  
 
-#preconditionDict(ListFile)
+#print(preconditionDict(ListFile))
 listPreCond = findPrecondition(ListFile)
 overridePreCond = overrideDict(listPreCond)
 mandatoryOverride = mandatoryDict(overridePreCond)
