@@ -20,7 +20,7 @@ if(__name__=="__main__"):
     errorAddCheck = errorDict(addCheckOverride)
     createDirForResultIfNotExist("./generate")
     csvContent = writePreconditionDict(ListFiles)
-    writeDictFile(listPreCond,"./generate/errorResult.txt")
+    writeDictFile(listPreCond,"./generate/preconditionResult.txt")
     writeDictFile(overridePreCond,"./generate/overridePreCond.txt")
     writeDictFile(mandatoryOverride,"./generate/mandatoryOverride.txt")
     writeDictFile(addCheckOverride,"./generate/addCheckOverride.txt")

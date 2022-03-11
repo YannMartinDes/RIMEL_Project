@@ -35,7 +35,7 @@ def findPrecondition(ListFile):
 def run():
     listPreCond = findPrecondition(ListFiles)
     createDirForResultIfNotExist("./generate")
-    writeDictFile(listPreCond,"./generate/errorResult.txt")
+    writeDictFile(listPreCond,"./generate/preconditionResult.txt")
 
 if __name__ == "__main__":
     run()
