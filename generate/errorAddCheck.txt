@@ -1,0 +1,179 @@
+AbstractPerformanceEvaluator.java  --------------------------------------------------------
+Error(new MetaDataUnderspecifiedError(exampleSetInput))
+
+Error(new MetaDataUnderspecifiedError(exampleSetInput))
+
+Error(new MetaDataUnderspecifiedError(exampleSetInput))
+
+Error(new SimpleMetaDataError(Severity.ERROR, exampleSetInput,
+								"label_prediction_mismatch", new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type1),
+										Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type2) }))
+
+Error(new SimpleMetaDataError(Severity.ERROR, exampleSetInput,
+								"label_prediction_mismatch", new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type1),
+										Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type2) }))
+
+Error(Severity.ERROR, exampleSetInput,
+								"label_prediction_mismatch", new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type1),
+										Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type2) }));
+					} else if (
+
+Error(new SimpleMetaDataError(Severity.ERROR, exampleSetInput,
+								"cannot_evaluate_label_type", new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type1) }))
+
+ROCChartGenerator.java  --------------------------------------------------------
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.ERROR, "exampleset.needs_prediction")
+
+Error(Severity.WARNING, "exampleset.needs_prediction")
+
+KernelKMeans.java  --------------------------------------------------------
+Error(Severity.WARNING, algoWeightQuickFix, "learner_does_not_support_weights")
+
+Error(Severity.WARNING, algoWeightQuickFix, "learner_does_not_support_weights")
+
+Error(Severity.WARNING, algoWeightQuickFix, "learner_does_not_support_weights")
+
+Error(Severity.WARNING, algoWeightQuickFix, "learner_does_not_support_weights")
+
+Error(Severity.WARNING, algoWeightQuickFix, "learner_does_not_support_weights")
+
+FastICA.java  --------------------------------------------------------
+Error(new SimpleMetaDataError(sev, exampleSetInput,
+								Collections.singletonList(new ParameterSettingQuickFix(FastICA.this,
+										PARAMETER_NUMBER_OF_COMPONENTS, emd.getNumberOfRegularAttributes() + "")),
+								"exampleset.parameters.need_more_attributes", desiredComponents,
+								PARAMETER_NUMBER_OF_COMPONENTS, desiredComponents))
+
+Error(new SimpleMetaDataError(sev, exampleSetInput,
+								Collections.singletonList(new ParameterSettingQuickFix(FastICA.this,
+										PARAMETER_NUMBER_OF_COMPONENTS, emd.getNumberOfRegularAttributes() + "")),
+								"exampleset.parameters.need_more_attributes", desiredComponents,
+								PARAMETER_NUMBER_OF_COMPONENTS, desiredComponents))
+
+GSPOperator.java  --------------------------------------------------------
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+Error(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) })
+
+LibSVMLearner.java  --------------------------------------------------------
+Error(
+														new SimpleMetaDataError(Severity.ERROR, getExampleSetInputPort(),
+																Collections.singletonList(new CategorySelectionQuickFix(
+																		LibSVMLearner.this, PARAMETER_SVM_TYPE,
+																		new String[] { SVM_TYPES[SVM_TYPE_C_SVC],
+																				SVM_TYPES[SVM_TYPE_NU_SVC],
+																				SVM_TYPES[SVM_TYPE_ONE_CLASS] },
+																		SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)],
+																		"Select appropriate " + PARAMETER_SVM_TYPE + " for "
+																				+ OperatorCapability.POLYNOMINAL_LABEL)),
+																"parameters.cannot_handle",
+																OperatorCapability.POLYNOMINAL_LABEL, PARAMETER_SVM_TYPE,
+																SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)]))
+
+Error(
+														new SimpleMetaDataError(Severity.ERROR, getExampleSetInputPort(),
+																Collections.singletonList(new CategorySelectionQuickFix(
+																		LibSVMLearner.this, PARAMETER_SVM_TYPE,
+																		new String[] { SVM_TYPES[SVM_TYPE_NU_SVR],
+																				SVM_TYPES[SVM_TYPE_EPS_SVR] },
+																		SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)],
+																		"Select appropriate " + PARAMETER_SVM_TYPE + " for "
+																				+ OperatorCapability.NUMERICAL_LABEL)),
+																"parameters.cannot_handle",
+																OperatorCapability.NUMERICAL_LABEL, PARAMETER_SVM_TYPE,
+																SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)]))
+
+Error(
+														new SimpleMetaDataError(Severity.ERROR, getExampleSetInputPort(),
+																Collections.singletonList(new CategorySelectionQuickFix(
+																		LibSVMLearner.this, PARAMETER_SVM_TYPE,
+																		new String[] { SVM_TYPES[SVM_TYPE_NU_SVR],
+																				SVM_TYPES[SVM_TYPE_EPS_SVR] },
+																		SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)],
+																		"Select appropriate " + PARAMETER_SVM_TYPE + " for "
+																				+ OperatorCapability.NUMERICAL_LABEL)),
+																"parameters.cannot_handle",
+																OperatorCapability.NUMERICAL_LABEL, PARAMETER_SVM_TYPE,
+																SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)]))
+
+ExampleSetToDictionary.java  --------------------------------------------------------
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from))
+
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from))
+
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from))
+
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from))
+
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from))
+
+Error(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from));
+					}
+					if (
+
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", to))
+
+Error(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", to))
+
+ANOVAMatrixOperator.java  --------------------------------------------------------
+Error(Severity.WARNING, "exampleset.must_contain_nominal_attribute")
+
+Error(Severity.WARNING, "exampleset.must_contain_nominal_attribute")
+
+Error(Severity.WARNING, "exampleset.must_contain_nominal_attribute")
+
+Error(Severity.WARNING, "exampleset.must_contain_nominal_attribute")
+
+Error(Severity.WARNING, "exampleset.must_contain_nominal_attribute")
+
+CovarianceMatrixOperator.java  --------------------------------------------------------
+Error(new SimpleMetaDataError(Severity.WARNING, exampleSetInput,
+								"not_defined_on_nominal", "Covariance"))
+
+Error(new SimpleMetaDataError(Severity.WARNING, exampleSetInput,
+								"not_defined_on_nominal", "Covariance"))
+
+Error(Severity.WARNING, exampleSetInput,
+								"not_defined_on_nominal", "Covariance"));
+						break;
+					}
+				}
+				super.makeAdditionalChecks(
+

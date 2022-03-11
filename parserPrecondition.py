@@ -1,7 +1,7 @@
 
 
 
-from parserUtils import ListFiles, findEndIndex
+from parserUtils import ListFiles, createDirForResultIfNotExist, findEndIndex, writeDictFile
 
 
 def findPrecondition(ListFile):
@@ -34,6 +34,8 @@ def findPrecondition(ListFile):
 
 def run():
     listPreCond = findPrecondition(ListFiles)
+    createDirForResultIfNotExist("./generate")
+    writeDictFile(listPreCond,"./generate/errorResult.txt")
 
 if __name__ == "__main__":
     run()

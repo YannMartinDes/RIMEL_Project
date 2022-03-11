@@ -1,0 +1,939 @@
+AbstractExampleSetProcessing.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInput, getRequiredMetaData()))
+
+AbstractIOTableProcessing.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(tableInput, getRequiredMetaData()))
+
+DataMacroDefinitionOperator.java  --------------------------------------------------------
+.addPrecondition(new ParameterConditionedPrecondition(exampleSetInput, new AttributeSetPrecondition(
+				exampleSetInput, AttributeSetPrecondition.getAttributesByParameter(this, PARAMETER_ATTRIBUTE_NAME)), this,
+				PARAMETER_MACRO_TYPE, MACRO_TYPES[MACRO_TYPE_DATA]))
+
+.addPrecondition(new ParameterConditionedPrecondition(exampleSetInput, new AttributeSetPrecondition(
+				exampleSetInput, AttributeSetPrecondition.getAttributesByParameter(this, PARAMETER_ATTRIBUTE_NAME)), this,
+				PARAMETER_MACRO_TYPE, MACRO_TYPES[MACRO_TYPE_STATISTICS]))
+
+IOMultiplyOperator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(inPort, new MetaData(desiredClass)))
+
+IOPublishToAppOperator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(storeInput, new MetaData(IOObject.class)))
+
+IOStorageOperator.java  --------------------------------------------------------
+.addPrecondition(new Precondition() {
+
+			@Override
+			public void assumeSatisfied() {
+				storeInput.receiveMD(new MetaData(getSelectedClass()));
+			}
+
+			@Override
+			public void check(MetaData metaData) {
+				Class<? extends IOObject> selected = getSelectedClass();
+				if (metaData == null) {
+					storeInput.addError(new InputMissingMetaDataError(storeInput, selected));
+				} else {
+					if (!selected.isAssignableFrom(metaData.getObjectClass())) {
+						storeInput.addError(new InputMissingMetaDataError(storeInput, selected, metaData.getObjectClass()));
+					}
+				}
+			}
+
+			@Override
+			public String getDescription() {
+				return "expect: " + getSelectedClass();
+			}
+
+			@Override
+			public boolean isCompatible(MetaData input, CompatibilityLevel level) {
+				boolean result = input != null && getSelectedClass().isAssignableFrom(input.getObjectClass());
+				return result;
+			}
+
+			@Override
+			public MetaData getExpectedMetaData() {
+				return new MetaData(IOObject.class);
+			}
+
+		})
+
+ModelApplier.java  --------------------------------------------------------
+.addPrecondition(
+				new SimplePrecondition(modelInput, new ModelMetaData(Model.class, new ExampleSetMetaData())))
+
+.addPrecondition(new SimplePrecondition(initialDataInput, new ExampleSetMetaData()))
+
+ClusterToPrediction.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, -1, Attributes.LABEL_NAME,
+				Attributes.CLUSTER_NAME))
+
+FeatureOperator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()))
+
+.addPrecondition(new SimplePrecondition(subprocessPerformanceInput, new MetaData(PerformanceVector.class)))
+
+AbstractWriter.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(inputPort, new MetaData(savedClass)))
+
+AbstractIOTableLearner.java  --------------------------------------------------------
+.addPrecondition(new TableLearnerPrecondition(this, tableInput))
+
+AbstractLearner.java  --------------------------------------------------------
+.addPrecondition(new LearnerPrecondition(this, exampleSetInput))
+
+AbstractSplitChain.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()))
+
+ClusterIterator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.VALUE_TYPE,
+				new String[] { Attributes.CLUSTER_NAME }))
+
+ExampleSetIterator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(performanceInnerSink, new MetaData(
+				PerformanceVector.class), false) {
+
+			@Override
+			public boolean isMandatory() {
+				return ExampleSetIterator.this.getParameterAsBoolean(PARAMETER_ONLY_BEST);
+			}
+		})
+
+FeatureIterator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInnerSink, new ExampleSetMetaData(), false))
+
+ParameterIteratingOperatorChain.java  --------------------------------------------------------
+.addPrecondition(
+				new SimplePrecondition(getPerformanceInnerSink(), new MetaData(PerformanceVector.class),
+						isPerformanceRequired()))
+
+PartialExampleSetLearner.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, new String[0], Ontology.VALUE_TYPE,
+				Attributes.LABEL_NAME))
+
+RepeatUntilOperatorChain.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(performanceConditionInput, new MetaData(PerformanceVector.class)) {
+
+					@Override
+					protected boolean isMandatory() {
+						return getParameterAsBoolean(PARAMETER_CONDITION_PERFORMANCE);
+					}
+				})
+
+.addPrecondition(new SimplePrecondition(exampleSetConditionInput, new MetaData(ExampleSet.class)) {
+
+					@Override
+					protected boolean isMandatory() {
+						return getParameterAsBoolean(PARAMETER_CONDITION_EXAMPLES);
+					}
+				})
+
+ValueIteration.java  --------------------------------------------------------
+.addPrecondition(new AttributeParameterPrecondition(exampleSetInput, this, PARAMETER_ATTRIBUTE,
+				Ontology.NOMINAL))
+
+ValueSubgroupIteration.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, new AttributeNameProvider() {
+
+			@Override
+			public String[] getRequiredAttributeNames() {
+				try {
+					List<String[]> attributeValueOptions;
+					attributeValueOptions = getParameterList(PARAMETER_ATTRIBUTES);
+					String[] groupAttributes = new String[attributeValueOptions.size()];
+					int i = 0;
+					for (String[] pair : attributeValueOptions) {
+						groupAttributes[i] = pair[0];
+						i++;
+					}
+					return groupAttributes;
+				} catch (UndefinedParameterError e) {
+					return new String[0];
+				}
+			}
+		}))
+
+XVPrediction.java  --------------------------------------------------------
+.addPrecondition(new CapabilityPrecondition(this, exampleSetInput))
+
+ZippedFileIterator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(fileInputPort, new MetaData(FileObject.class)) {
+
+			@Override
+			protected boolean isMandatory() {
+				return false;
+			}
+		})
+
+ExcelFormatExampleSource.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(fileInputPort, new MetaData(FileObject.class)) {
+
+			@Override
+			protected boolean isMandatory() {
+				return false;
+			}
+		})
+
+AbstractPerformanceEvaluator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput,
+		// Ontology.VALUE_TYPE, Attributes.LABEL_NAME,
+		// Attributes.PREDICTION_NAME))
+
+.addPrecondition(new CapabilityPrecondition(this, exampleSetInput))
+
+.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()) {
+
+			@Override
+			public void makeAdditionalChecks(MetaData metaData) {
+				if (!(metaData instanceof ExampleSetMetaData)) {
+					exampleSetInput.addError(new MetaDataUnderspecifiedError(exampleSetInput));
+					return;
+				}
+				ExampleSetMetaData emd = (ExampleSetMetaData) metaData;
+				if (emd.hasSpecial(Attributes.LABEL_NAME) == MetaDataInfo.YES
+						&& emd.hasSpecial(Attributes.PREDICTION_NAME) == MetaDataInfo.YES) {
+					int type1 = emd.getSpecial(Attributes.LABEL_NAME).getValueType();
+					int type2 = emd.getSpecial(Attributes.PREDICTION_NAME).getValueType();
+					if (type1 != type2) {
+						exampleSetInput.addError(new SimpleMetaDataError(Severity.ERROR, exampleSetInput,
+								"label_prediction_mismatch", new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type1),
+										Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type2) }));
+					} else if (!canEvaluate(type1)) {
+						exampleSetInput.addError(new SimpleMetaDataError(Severity.ERROR, exampleSetInput,
+								"cannot_evaluate_label_type", new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(type1) }));
+					}
+				}
+			}
+		})
+
+.addPrecondition(new SimplePrecondition(performanceInput, new MetaData(PerformanceVector.class),
+				false))
+
+Data2Performance.java  --------------------------------------------------------
+.addPrecondition(
+				new ParameterConditionedPrecondition(getExampleSetInputPort(), new AttributeSetPrecondition(
+						getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(this,
+								PARAMETER_ATTRIBUTE_NAME)), this, PARAMETER_PERFORMANCE_TYPE, MACRO_TYPES[MACRO_TYPE_DATA]))
+
+.addPrecondition(
+				new ParameterConditionedPrecondition(getExampleSetInputPort(), new AttributeSetPrecondition(
+						getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(this,
+								PARAMETER_ATTRIBUTE_NAME)), this, PARAMETER_PERFORMANCE_TYPE,
+						MACRO_TYPES[MACRO_TYPE_STATISTICS]))
+
+InputPortExtender.java  --------------------------------------------------------
+.addPrecondition(new CollectionPrecondition(precondition))
+
+PortPairExtender.java  --------------------------------------------------------
+.addPrecondition(new CollectionPrecondition(sp))
+
+.addPrecondition(sp)
+
+GeneratePredictionOperator.java  --------------------------------------------------------
+.addPrecondition(
+				new ExampleSetPrecondition(getExampleSetInputPort(), Attributes.CONFIDENCE_NAME, Ontology.NUMERICAL))
+
+GeneratePredictionRankingOperator.java  --------------------------------------------------------
+.addPrecondition(
+				new ExampleSetPrecondition(getExampleSetInputPort(), Attributes.PREDICTION_NAME, Ontology.NOMINAL))
+
+.addPrecondition(
+				new ExampleSetPrecondition(getExampleSetInputPort(), Attributes.CONFIDENCE_NAME, Ontology.NUMERICAL))
+
+RecallChooser.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.VALUE_TYPE,
+				Attributes.LABEL_NAME, Attributes.PREDICTION_NAME, Attributes.CONFIDENCE_NAME))
+
+SimpleUncertainPredictionsTransformation.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(getExampleSetInputPort(), Ontology.VALUE_TYPE,
+				Attributes.PREDICTION_NAME, Attributes.CONFIDENCE_NAME))
+
+ThresholdApplier.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.VALUE_TYPE,
+				Attributes.PREDICTION_NAME, Attributes.CONFIDENCE_NAME))
+
+ThresholdFinder.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.VALUE_TYPE,
+				Attributes.LABEL_NAME, Attributes.PREDICTION_NAME, Attributes.CONFIDENCE_NAME))
+
+GroupByOperator.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_ATTRIBUTE_NAME), Ontology.NOMINAL))
+
+IOTablePreprocessingOperator.java  --------------------------------------------------------
+.addPrecondition(new Precondition() {
+			@Override
+			public void check(MetaData metaData) {
+				TableMetaData tmd = BeltConversionTools.asTableMetaDataOrNull(metaData);
+				if (tmd != null) {
+					TableMetaData metaDataSubset = subsetSelector.getMetaDataSubset(tmd, false);
+					if (metaDataSubset.labels().isEmpty()) {
+						QuickFix selectAllQuickFix = new AbstractQuickFix(4, false, "attributefilter_select_all") {
+
+							@Override
+							public void apply() {
+								IOTablePreprocessingOperator.this.getParameters().setParameter(TableSubsetSelector.PARAMETER_FILTER_NAME,
+										TableSubsetSelector.ALL_ATTRIBUTES_FILTER);
+							}
+						};
+						SimpleMetaDataError error =
+								new SimpleMetaDataError(ProcessSetupError.Severity.WARNING, getTableInputPort(),
+										Collections.singletonList(selectAllQuickFix),
+										"attribute_selection_empty");
+						getTableInputPort().addError(error);
+					}
+				}
+			}
+
+			@Override
+			public String getDescription() {
+				return "Example set matching at least one selected attribute.";
+			}
+
+			@Override
+			public boolean isCompatible(MetaData input, CompatibilityLevel level) {
+				return null != input && (IOTable.class.isAssignableFrom(input.getObjectClass()) ||
+						AtPortConverter.isConvertible(input.getObjectClass(), IOTable.class));
+			}
+
+			@Override
+			public void assumeSatisfied() {
+				//not needed
+			}
+
+			@Override
+			public MetaData getExpectedMetaData() {
+				return new TableMetaData();
+			}
+		})
+
+PreprocessingOperator.java  --------------------------------------------------------
+.addPrecondition(attributeSelector.makePrecondition())
+
+ExampleSet2Similarity.java  --------------------------------------------------------
+.addPrecondition(new DistanceMeasurePrecondition(exampleSetInput, this))
+
+ExampleSet2SimilarityExampleSet.java  --------------------------------------------------------
+.addPrecondition(new DistanceMeasurePrecondition(exampleSetInput, this))
+
+ValidationChain.java  --------------------------------------------------------
+.addPrecondition(getCapabilityPrecondition())
+
+.addPrecondition(new SimplePrecondition(inputPort, new MetaData(PerformanceVector.class)))
+
+WrapperValidationChain.java  --------------------------------------------------------
+.addPrecondition(getCapabilityPrecondition())
+
+Data2Log.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_ATTRIBUTE_NAME)))
+
+.addPrecondition(new ExampleSetSizePrecondition(exampleSetInput, this, PARAMETER_EXAMPLE_INDEX))
+
+LiftChartGenerator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Attributes.LABEL_NAME, Ontology.NOMINAL))
+
+LiftParetoChartGenerator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Attributes.LABEL_NAME, Ontology.NOMINAL))
+
+.addPrecondition(new SimplePrecondition(modelInput, new MetaData(Model.class)) {
+
+			@Override
+			protected boolean isMandatory() {
+				ExampleSetMetaData emd = exampleSetInput.getMetaDataAsOrNull(ExampleSetMetaData.class);
+				if (emd != null) {
+					return emd.containsSpecialAttribute(Attributes.PREDICTION_NAME) == MetaDataInfo.NO;
+				}
+				return true;
+			}
+		})
+
+ROCBasedComparisonOperator.java  --------------------------------------------------------
+.addPrecondition(new CapabilityPrecondition(this, exampleSetInput))
+
+ROCChartGenerator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Attributes.LABEL_NAME, Ontology.NOMINAL) {
+
+					@Override
+					public void makeAdditionalChecks(ExampleSetMetaData emd) throws UndefinedParameterError {
+						MetaDataInfo contained = emd.containsSpecialAttribute(Attributes.PREDICTION_NAME);
+						if (!getParameterAsBoolean(PARAMETER_USE_MODEL) && (contained != MetaDataInfo.YES)) {
+							if (contained == MetaDataInfo.NO) {
+								createError(Severity.ERROR, "exampleset.needs_prediction");
+							} else {
+								createError(Severity.WARNING, "exampleset.needs_prediction");
+							}
+						}
+					}
+				})
+
+.addPrecondition(new SimplePrecondition(modelInput, new MetaData(Model.class)) {
+
+			@Override
+			protected boolean isMandatory() {
+				return getParameterAsBoolean(PARAMETER_USE_MODEL);
+			}
+		})
+
+AbstractClusterer.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()))
+
+AgglomerativeClustering.java  --------------------------------------------------------
+.addPrecondition(new DistanceMeasurePrecondition(exampleSetInput, this))
+
+.addPrecondition(new CapabilityPrecondition(this, exampleSetInput))
+
+ExampleSet2ClusterModel.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput))
+
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_ATTRIBUTE)))
+
+KernelKMeans.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(getExampleSetInputPort(), new ExampleSetMetaData(), false) {
+
+					@Override
+					public void makeAdditionalChecks(MetaData received) {
+						if (!(received instanceof ExampleSetMetaData)) {
+							return;
+						}
+						ExampleSetMetaData emd = (ExampleSetMetaData) received;
+						if (emd.hasSpecial(Attributes.WEIGHT_NAME) == MetaDataInfo.YES
+								&& !getParameterAsBoolean(PARAMETER_USE_WEIGHTS)) {
+							createError(Severity.WARNING, algoWeightQuickFix, "learner_does_not_support_weights");
+						}
+					}
+				})
+
+RMAbstractClusterer.java  --------------------------------------------------------
+.addPrecondition(new DistanceMeasurePrecondition(exampleInput, this))
+
+.addPrecondition(new CapabilityPrecondition(this, exampleInput))
+
+TopDownClustering.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()))
+
+.addPrecondition(new SimplePrecondition(modelInnerSink, new MetaData(ClusterModel.class)))
+
+GenerateAttributes.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(tableInput, new ExampleSetMetaData()))
+
+GeneticAlgorithm.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(attributeWeightsInput, new MetaData(
+				AttributeWeights.class), false) {
+
+			@Override
+			public boolean isCompatible(MetaData input, CompatibilityLevel level) {
+				if (isParameterSet(PARAMETER_INITIALIZE_WITH_INPUT_WEIGHTS)) {
+					if (input.getObjectClass().equals(AttributeWeights.class)) {
+						return getParameterAsBoolean(PARAMETER_INITIALIZE_WITH_INPUT_WEIGHTS);
+					}
+				}
+				return false;
+			}
+
+			@Override
+			protected boolean isMandatory() {
+				if (isParameterSet(PARAMETER_INITIALIZE_WITH_INPUT_WEIGHTS)) {
+					return getParameterAsBoolean(PARAMETER_INITIALIZE_WITH_INPUT_WEIGHTS);
+				}
+				return false;
+			}
+		})
+
+DimensionalityReducer.java  --------------------------------------------------------
+.addPrecondition(new CapabilityPrecondition(this, exampleSetInput))
+
+FastICA.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.NUMERICAL) {
+
+			@Override
+			public void makeAdditionalChecks(ExampleSetMetaData emd) throws UndefinedParameterError {
+				int desiredComponents = getParameterAsInt(PARAMETER_NUMBER_OF_COMPONENTS);
+				if (desiredComponents > emd.getNumberOfRegularAttributes()
+						&& getParameterAsInt(PARAMETER_REDUCTION_TYPE) == REDUCTION_FIXED) {
+					if (emd.getAttributeSetRelation() != SetRelation.UNKNOWN) {
+						Severity sev = Severity.ERROR;
+						if (emd.getAttributeSetRelation() == SetRelation.SUPERSET) {
+							sev = Severity.WARNING;
+						}
+						exampleSetInput.addError(new SimpleMetaDataError(sev, exampleSetInput,
+								Collections.singletonList(new ParameterSettingQuickFix(FastICA.this,
+										PARAMETER_NUMBER_OF_COMPONENTS, emd.getNumberOfRegularAttributes() + "")),
+								"exampleset.parameters.need_more_attributes", desiredComponents,
+								PARAMETER_NUMBER_OF_COMPONENTS, desiredComponents));
+					}
+				}
+				super.makeAdditionalChecks(emd);
+			}
+		})
+
+GHA.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.NUMERICAL))
+
+KernelPCA.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.NUMERICAL))
+
+PCA.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.NUMERICAL))
+
+SOMDimensionalityReduction.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.NUMERICAL))
+
+SVDReduction.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.NUMERICAL))
+
+AbstractWeighting.java  --------------------------------------------------------
+.addPrecondition(new CapabilityPrecondition(this, exampleSetInput))
+
+EvolutionaryWeighting.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(attributeWeightsInput, new MetaData(
+				AttributeWeights.class), false))
+
+ForestBasedWeighting.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(forestInput, new RandomForestModelMetaData(), true))
+
+InteractiveAttributeWeighting.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(weightInput, new MetaData(AttributeWeights.class), false))
+
+FunctionFitting.java  --------------------------------------------------------
+.addPrecondition(new TableCapabilityPrecondition(this, tableInput))
+
+DefaultLearner.java  --------------------------------------------------------
+.addPrecondition(new ParameterConditionedPrecondition(exampleIn, new AttributeSetPrecondition(exampleIn,
+				new AttributeSetPrecondition.AttributeNameProvider() {
+
+					@Override
+					public String[] getRequiredAttributeNames() {
+						try {
+							return new String[] { getParameterAsString(PARAMETER_ATTRIBUTE_NAME) };
+						} catch (UndefinedParameterError e) {
+							return new String[0];
+						}
+					}
+				}), this, PARAMETER_METHOD, METHODS[ATTRIBUTE]))
+
+KNNLearner.java  --------------------------------------------------------
+.addPrecondition(new DistanceMeasurePrecondition(getExampleSetInputPort(), this))
+
+AbstractMetaLearner.java  --------------------------------------------------------
+.addPrecondition(new LearnerPrecondition(this, exampleSetInput))
+
+.addPrecondition(new SimplePrecondition(innerModelSink, new PredictionModelMetaData(
+				PredictionModel.class, new ExampleSetMetaData())))
+
+BayesianBoosting.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(modelInput, new PredictionModelMetaData(PredictionModel.class,
+				new ExampleSetMetaData()), false))
+
+Tree2RuleConverter.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(innerModelSink, new PredictionModelMetaData(TreeModel.class)))
+
+AbstractParallelTreeLearner.java  --------------------------------------------------------
+.addPrecondition(new ParameterConditionedPrecondition(exampleInput, numericalCondition, this,
+				PARAMETER_CRITERION, CRITERIA_NAMES[CRITERION_LEAST_SQUARE]))
+
+.addPrecondition(new ParameterConditionedPrecondition(exampleInput, nominalCondition, this,
+				PARAMETER_CRITERION, CRITERIA_NAMES[CRITERION_ACCURACY]))
+
+.addPrecondition(new ParameterConditionedPrecondition(exampleInput, nominalCondition, this,
+				PARAMETER_CRITERION, CRITERIA_NAMES[CRITERION_GAIN_RATIO]))
+
+.addPrecondition(new ParameterConditionedPrecondition(exampleInput, nominalCondition, this,
+				PARAMETER_CRITERION, CRITERIA_NAMES[CRITERION_GINI_INDEX]))
+
+.addPrecondition(new ParameterConditionedPrecondition(exampleInput, nominalCondition, this,
+				PARAMETER_CRITERION, CRITERIA_NAMES[CRITERION_INFO_GAIN]))
+
+RelevanceTreeLearner.java  --------------------------------------------------------
+.addPrecondition(new LearnerPrecondition(this, exampleSetInput))
+
+.addPrecondition(new SimplePrecondition(weightsInnerSink, new MetaData(AttributeWeights.class),
+				false))
+
+FPGrowth.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.BINOMINAL))
+
+GSPOperator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData(), true) {
+
+			@Override
+			public void makeAdditionalChecks(MetaData metaData) {
+				if (metaData instanceof ExampleSetMetaData) {
+					ExampleSetMetaData emd = (ExampleSetMetaData) metaData;
+
+					String customerAttribute = "";
+					String timeAttribute = "";
+					try {
+						customerAttribute = getParameterAsString(PARAMETER_CUSTOMER_ATTRIBUTE);
+						timeAttribute = getParameterAsString(PARAMETER_TIME_ATTRIBUTE);
+					} catch (UndefinedParameterError e) {
+					}
+
+					// checking allowed types
+					for (AttributeMetaData amd : emd.getAllAttributes()) {
+						if (amd.isSpecial()) {
+							continue;
+						}
+						// check if name is in ignore list
+						if (amd.getName().equals(customerAttribute) || amd.getName().equals(timeAttribute)) {
+							continue;
+						}
+
+						// otherwise do check
+						if (!Ontology.ATTRIBUTE_VALUE_TYPE.isA(amd.getValueType(), Ontology.NOMINAL)) {
+							createError(Severity.ERROR, "regular_type_mismatch",
+									new Object[] { Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(Ontology.BINOMINAL) });
+							break;
+						}
+					}
+				}
+			}
+		})
+
+.addPrecondition(new AttributeParameterPrecondition(exampleSetInput, this, PARAMETER_CUSTOMER_ATTRIBUTE))
+
+.addPrecondition(
+				new AttributeParameterPrecondition(exampleSetInput, this, PARAMETER_TIME_ATTRIBUTE, Ontology.NUMERICAL))
+
+LibSVMLearner.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(getExampleSetInputPort(), null, false) {
+
+			@Override
+			public void makeAdditionalChecks(MetaData received) {
+				if (received instanceof ExampleSetMetaData) {
+					ExampleSetMetaData emd = (ExampleSetMetaData) received;
+					switch (emd.hasSpecial(Attributes.LABEL_NAME)) {
+						case NO:
+						case UNKNOWN:
+							return;
+						case YES:
+							try {
+								AttributeMetaData label = emd.getLabelMetaData();
+								if (label.isNominal()) {
+									if (getParameterAsInt(PARAMETER_SVM_TYPE) == SVM_TYPE_NU_SVR
+											|| getParameterAsInt(PARAMETER_SVM_TYPE) == SVM_TYPE_EPS_SVR) {
+										getExampleSetInputPort()
+												.addError(
+														new SimpleMetaDataError(Severity.ERROR, getExampleSetInputPort(),
+																Collections.singletonList(new CategorySelectionQuickFix(
+																		LibSVMLearner.this, PARAMETER_SVM_TYPE,
+																		new String[] { SVM_TYPES[SVM_TYPE_C_SVC],
+																				SVM_TYPES[SVM_TYPE_NU_SVC],
+																				SVM_TYPES[SVM_TYPE_ONE_CLASS] },
+																		SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)],
+																		"Select appropriate " + PARAMETER_SVM_TYPE + " for "
+																				+ OperatorCapability.POLYNOMINAL_LABEL)),
+																"parameters.cannot_handle",
+																OperatorCapability.POLYNOMINAL_LABEL, PARAMETER_SVM_TYPE,
+																SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)]));
+									}
+								} else if (label.isNumerical()) {
+									if (getParameterAsInt(PARAMETER_SVM_TYPE) == SVM_TYPE_NU_SVC
+											|| getParameterAsInt(PARAMETER_SVM_TYPE) == SVM_TYPE_C_SVC) {
+										getExampleSetInputPort()
+												.addError(
+														new SimpleMetaDataError(Severity.ERROR, getExampleSetInputPort(),
+																Collections.singletonList(new CategorySelectionQuickFix(
+																		LibSVMLearner.this, PARAMETER_SVM_TYPE,
+																		new String[] { SVM_TYPES[SVM_TYPE_NU_SVR],
+																				SVM_TYPES[SVM_TYPE_EPS_SVR] },
+																		SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)],
+																		"Select appropriate " + PARAMETER_SVM_TYPE + " for "
+																				+ OperatorCapability.NUMERICAL_LABEL)),
+																"parameters.cannot_handle",
+																OperatorCapability.NUMERICAL_LABEL, PARAMETER_SVM_TYPE,
+																SVM_TYPES[getParameterAsInt(PARAMETER_SVM_TYPE)]));
+									}
+								}
+							} catch (UndefinedParameterError e) {
+							}
+					}
+				}
+			}
+		})
+
+FileInputPortHandler.java  --------------------------------------------------------
+.addPrecondition(precondition)
+
+AbstractDataResultSetReader.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(fileInputPort, new MetaData(FileObject.class)) {
+
+			@Override
+			protected boolean isMandatory() {
+				return false;
+			}
+		})
+
+AbstractDataResultTableReader.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(fileInputPort, new MetaData(FileObject.class)) {
+
+			@Override
+			protected boolean isMandatory() {
+				return false;
+			}
+		})
+
+CostEvaluator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.ATTRIBUTE_VALUE,
+				Attributes.LABEL_NAME))
+
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.ATTRIBUTE_VALUE,
+				Attributes.PREDICTION_NAME))
+
+RankingEvaluator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.ATTRIBUTE_VALUE,
+				Attributes.LABEL_NAME))
+
+InputPortsImpl.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(in, metaData))
+
+AddNominalValue.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME), Ontology.NOMINAL))
+
+AttributeCopy.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+AttributeMerge.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_FIRST_ATTRIBUTE, PARAMETER_SECOND_ATTRIBUTE)))
+
+ChangeAttributeName.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_OLD_NAME)))
+
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition
+						.getAttributesByParameterListEntry(this, PARAMETER_RENAME_ATTRIBUTES, 0)))
+
+ChangeAttributeRole.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_NAME)))
+
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition
+						.getAttributesByParameterListEntry(this, PARAMETER_CHANGE_ATTRIBUTES, 0)))
+
+Date2Nominal.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeParameterPrecondition(getExampleSetInputPort(), this, PARAMETER_ATTRIBUTE_NAME,
+						Ontology.DATE_TIME))
+
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+Date2Numerical.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeParameterPrecondition(getExampleSetInputPort(), this, PARAMETER_ATTRIBUTE_NAME,
+						Ontology.DATE_TIME))
+
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+DateAdjust.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME), Ontology.DATE_TIME))
+
+ExampleRangeFilter.java  --------------------------------------------------------
+.addPrecondition(
+				new ExampleSetSizePrecondition(getExampleSetInputPort(), this, PARAMETER_FIRST_EXAMPLE,
+						PARAMETER_LAST_EXAMPLE))
+
+ExampleSetToDictionary.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(dictionaryInput) {
+
+			@Override
+			public void makeAdditionalChecks(ExampleSetMetaData dictionaryMD) throws UndefinedParameterError {
+				if (dictionaryMD.getAttributeSetRelation() == SetRelation.EQUAL
+						|| dictionaryMD.getAttributeSetRelation() == SetRelation.SUPERSET) {
+					String from = getParameterAsString(PARAMETER_FROM_ATTRIBUTE);
+					String to = getParameterAsString(PARAMETER_TO_ATTRIBUTE);
+					if (!(dictionaryMD.containsAttributeName(from) == MetaDataInfo.YES) && !from.isEmpty()) {
+						dictionaryInput.addError(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", from));
+					}
+					if (!(dictionaryMD.containsAttributeName(to) == MetaDataInfo.YES) && !to.isEmpty()) {
+						dictionaryInput.addError(new SimpleMetaDataError(Severity.ERROR, dictionaryInput,
+								"missing_attribute", to));
+					}
+				}
+			}
+		})
+
+ExchangeAttributeRoles.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_FIRST_ATTRIBUTE, PARAMETER_SECOND_ATTRIBUTE)))
+
+FillDataGaps.java  --------------------------------------------------------
+.addPrecondition(
+				new ExampleSetPrecondition(getExampleSetInputPort(), Ontology.VALUE_TYPE, Attributes.ID_NAME))
+
+InternalBinominalRemapping.java  --------------------------------------------------------
+.addPrecondition(attributeSelector.makePrecondition())
+
+MergeNominalValues.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+Nominal2Date.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+Numerical2Date.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+SetData.java  --------------------------------------------------------
+.addPrecondition(
+				new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition.getAttributesByParameter(
+						this, PARAMETER_ATTRIBUTE_NAME)))
+
+Sorting.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(getExampleSetInputPort(),
+				AttributeSetPrecondition.getAttributesByParameter(this, PARAMETER_ATTRIBUTE_NAME)))
+
+ExampleSetCartesian.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(getLeftInput()))
+
+.addPrecondition(new ExampleSetPrecondition(getRightInput()))
+
+ExampleSetIntersect.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(secondInput, Ontology.ATTRIBUTE_VALUE, Attributes.ID_NAME))
+
+.addPrecondition(new ExampleSetPrecondition(
+				(InputPort) getInputPort().getPorts().getPortByIndex(0), Ontology.ATTRIBUTE_VALUE, Attributes.ID_NAME))
+
+ExampleSetJoin.java  --------------------------------------------------------
+.addPrecondition(new ParameterConditionedPrecondition(getLeftInput(),
+				new ExampleSetPrecondition(getLeftInput(), Ontology.ATTRIBUTE_VALUE, Attributes.ID_NAME), this,
+				PARAMETER_USE_ID, "true"))
+
+.addPrecondition(new ParameterConditionedPrecondition(getLeftInput(),
+				new ExampleSetPrecondition(getLeftInput()), this, PARAMETER_USE_ID, "false"))
+
+.addPrecondition(new ParameterConditionedPrecondition(getRightInput(),
+				new ExampleSetPrecondition(getRightInput(), Ontology.ATTRIBUTE_VALUE, Attributes.ID_NAME), this,
+				PARAMETER_USE_ID, "true"))
+
+.addPrecondition(new ParameterConditionedPrecondition(getRightInput(),
+				new ExampleSetPrecondition(getRightInput()), this, PARAMETER_USE_ID, "false"))
+
+ExampleSetMinus.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(subtrahendInput, Ontology.ATTRIBUTE_VALUE,
+				Attributes.ID_NAME))
+
+.addPrecondition(
+				new ExampleSetPrecondition(getExampleSetInputPort(), Ontology.ATTRIBUTE_VALUE, Attributes.ID_NAME))
+
+ExampleSetUnion.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSet1Input, -1,
+		// Attributes.ID_NAME))
+
+.addPrecondition(new ExampleSetPrecondition(exampleSet2Input, -1,
+		// Attributes.ID_NAME))
+
+SamplingOperator.java  --------------------------------------------------------
+.addPrecondition(new ParameterConditionedPrecondition(getExampleSetInputPort(),
+				needNominalLabelCondition, getParameterHandler(), PARAMETER_BALANCE_DATA, Boolean.toString(true)))
+
+Attribute2ExamplePivoting.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(getExampleSetInputPort()))
+
+Example2AttributePivoting.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(getExampleSetInputPort(), AttributeSetPrecondition
+						.getAttributesByParameter(this, PARAMETER_GROUP_ATTRIBUTE, PARAMETER_INDEX_ATTRIBUTE)))
+
+GroupedANOVAOperator.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_ANOVA_ATTRIBUTE), Ontology.NUMERICAL))
+
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_GROUP_BY_ATTRIBUTE), Ontology.NOMINAL))
+
+EqualLabelWeighting.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(getExampleSetInputPort(), Ontology.ATTRIBUTE_VALUE, Attributes.LABEL_NAME))
+
+AttributeOrderingOperator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(referenceDataPort, new MetaData(ExampleSet.class), false))
+
+DataToAnnotations.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(annotationsInputPort, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_KEY_ATTRIBUTE)))
+
+.addPrecondition(new AttributeSetPrecondition(annotationsInputPort, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_VALUE_ATTRIBUTE)))
+
+CentroidBasedEvaluator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(performanceInput, new MetaData(PerformanceVector.class),
+				false))
+
+ClusterDensityEvaluator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput, Ontology.ATTRIBUTE_VALUE,
+				Attributes.ID_NAME))
+
+ClusterNumberEvaluator.java  --------------------------------------------------------
+.addPrecondition(new SimplePrecondition(performanceInput, new MetaData(PerformanceVector.class),
+				false))
+
+ANOVAMatrixOperator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput) {
+
+			@Override
+			public void makeAdditionalChecks(ExampleSetMetaData emd) throws UndefinedParameterError {
+				int numberOfNominals = 0;
+				for (AttributeMetaData amd : emd.getAllAttributes()) {
+					if (amd.isNominal()) {
+						numberOfNominals++;
+					}
+				}
+				if (numberOfNominals == 0) {
+					createError(Severity.WARNING, "exampleset.must_contain_nominal_attribute");
+				}
+			}
+		})
+
+CovarianceMatrixOperator.java  --------------------------------------------------------
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput) {
+
+			@Override
+			public void makeAdditionalChecks(ExampleSetMetaData emd) throws UndefinedParameterError {
+				for (AttributeMetaData amd : emd.getAllAttributes()) {
+					if (!amd.isSpecial() && !amd.isNumerical()) {
+						exampleSetInput.addError(new SimpleMetaDataError(Severity.WARNING, exampleSetInput,
+								"not_defined_on_nominal", "Covariance"));
+						break;
+					}
+				}
+				super.makeAdditionalChecks(emd);
+			}
+		})
+
+RainflowMatrixOperator.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_ATTRIBUTE), Ontology.NOMINAL))
+
+TransitionGraphOperator.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_SOURCE_ATTRIBUTE, PARAMETER_STRENGTH_ATTRIBUTE,
+						PARAMETER_TARGET_ATTRIBUTE, PARAMETER_TYPE_ATTRIBUTE)))
+
+.addPrecondition(new ExampleSetPrecondition(exampleSetInput,
+		// Attributes.ID_NAME, Ontology.ATTRIBUTE_VALUE))
+
+TransitionMatrixOperator.java  --------------------------------------------------------
+.addPrecondition(new AttributeSetPrecondition(exampleSetInput, AttributeSetPrecondition
+				.getAttributesByParameter(this, PARAMETER_ATTRIBUTE), Ontology.NOMINAL))
+
