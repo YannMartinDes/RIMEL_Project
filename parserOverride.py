@@ -1,5 +1,5 @@
 from parserPrecondition import findPrecondition
-from parserUtils import ListFiles
+from parserUtils import ListFiles, createDirForResultIfNotExist, writeDictFile
 
 
 def overrideDict(listPreCond):
@@ -18,6 +18,8 @@ def overrideDict(listPreCond):
 def run():
     listPreCond = findPrecondition(ListFiles)
     overridePreCond = overrideDict(listPreCond)
+    createDirForResultIfNotExist("./generate")
+    writeDictFile(overridePreCond,"./generate/overridePreCond.txt")
 
 if __name__ == "__main__":
     run()

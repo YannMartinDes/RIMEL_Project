@@ -1,6 +1,6 @@
 from parserOverride import overrideDict
 from parserPrecondition import findPrecondition
-from parserUtils import ListFiles
+from parserUtils import ListFiles, createDirForResultIfNotExist, writeDictFile
 
 
 def mandatoryDict(listPreCond):
@@ -65,12 +65,24 @@ def findTextBetweenChar(string,charOpen,charClose):
             return i
     return None 
 
+
+
+
+
+
+
+
 def run():
     listPreCond = findPrecondition(ListFiles)
     overridePreCond = overrideDict(listPreCond)
     mandatoryOverride = mandatoryDict(overridePreCond)
     addCheckOverride = additionnalCheckDict(listPreCond)
     errorAddCheck = errorDict(addCheckOverride)
+    
+    createDirForResultIfNotExist("./generate")
+    writeDictFile(mandatoryOverride,"./generate/mandatoryOverride.txt")
+    writeDictFile(addCheckOverride,"./generate/addCheckOverride.txt")
+    writeDictFile(errorAddCheck,"./generate/errorAddCheck.txt")
 
 if __name__ == "__main__":
     run()

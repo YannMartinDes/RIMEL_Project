@@ -1,10 +1,11 @@
 import glob2
 import csv
+import os
 
 ListFiles=glob2.glob(r".\rapidminer-studio-modular-master\rapidminer-studio-core\src\main\java\com\rapidminer\operator\**/*.java")
 
 
-def preconditionDict(ListFile):
+def writePreconditionDict(ListFile):
     dictList = {}
     for File in ListFile:
         file1 = open(File, 'r')
@@ -15,7 +16,7 @@ def preconditionDict(ListFile):
             body=getPreconditonNameAndIfOverrode(body,startIndex,dictList,File)
             startIndex=body.strip().find(".addPrecondition")
         file1.close()
-    printCSV(dictList)
+    return dictList
 
 def getPreconditonNameAndIfOverrode(body,startIndex,dictList,File):
     override= "Not Overrode"
@@ -91,3 +92,16 @@ def findEndIndex(string):
         if (count==0 and string[i]==";"):
             return i
     return None
+
+def createDirForResultIfNotExist(path):
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
+
+def writeDictFile(dictFile,path):
+    f = open(path,"w")
+    for key in dictFile:
+        f.write(key+"  --------------------------------------------------------\n")
+        for cond in dictFile[key]:
+            f.write(cond)
+            f.write("\n\n")
