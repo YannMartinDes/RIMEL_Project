@@ -1,0 +1,56 @@
+ExampleSetIterator.java  --------------------------------------------------------
+isMandatory() {
+				return ExampleSetIterator.this.getParameterAsBoolean(PARAMETER_ONLY_BEST);
+			}
+
+RepeatUntilOperatorChain.java  --------------------------------------------------------
+isMandatory() {
+						return getParameterAsBoolean(PARAMETER_CONDITION_PERFORMANCE);
+					}
+
+isMandatory() {
+						return getParameterAsBoolean(PARAMETER_CONDITION_EXAMPLES);
+					}
+
+ZippedFileIterator.java  --------------------------------------------------------
+isMandatory() {
+				return false;
+			}
+
+ExcelFormatExampleSource.java  --------------------------------------------------------
+isMandatory() {
+				return false;
+			}
+
+LiftParetoChartGenerator.java  --------------------------------------------------------
+isMandatory() {
+				ExampleSetMetaData emd = exampleSetInput.getMetaDataAsOrNull(ExampleSetMetaData.class);
+				if (emd != null) {
+					return emd.containsSpecialAttribute(Attributes.PREDICTION_NAME) == MetaDataInfo.NO;
+				}
+				return true;
+			}
+
+ROCChartGenerator.java  --------------------------------------------------------
+isMandatory() {
+				return getParameterAsBoolean(PARAMETER_USE_MODEL);
+			}
+
+GeneticAlgorithm.java  --------------------------------------------------------
+isMandatory() {
+				if (isParameterSet(PARAMETER_INITIALIZE_WITH_INPUT_WEIGHTS)) {
+					return getParameterAsBoolean(PARAMETER_INITIALIZE_WITH_INPUT_WEIGHTS);
+				}
+				return false;
+			}
+
+AbstractDataResultSetReader.java  --------------------------------------------------------
+isMandatory() {
+				return false;
+			}
+
+AbstractDataResultTableReader.java  --------------------------------------------------------
+isMandatory() {
+				return false;
+			}
+
